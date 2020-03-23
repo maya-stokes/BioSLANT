@@ -20,6 +20,7 @@ if isempty(t)
     t = (0:p.N-1)*p.saveint;
 end
 
+p.zmin = min(output(:)); p.zmax = max(output(:)); 
 
 % loop through the frames
 framenum = 0;

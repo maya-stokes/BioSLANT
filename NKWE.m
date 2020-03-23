@@ -40,7 +40,10 @@ AmSw = Am.*Sw;
 % record locations of channels (points that exceed threshold)
 Channels = AmSw > p.thetac;
 
-
+% Calculate fault damage factor, which reduces Keff close to fault planes
+if p.doFaults
+    Keff = Keff.*g.FaultFactor;
+end
 
 % calculate right-hand side of NKWE 
 

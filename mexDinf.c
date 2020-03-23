@@ -3383,7 +3383,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     mxArray *Wptr, *Mptr, *Dptr, *Basinptr, *minimaIdxptr;
     double *M, *Mfl, *Basin, *minimaIdx, *D, *F, *W, *A, *minima, *a, *fl, *b, *s, zppmin;
-    int i, j, n, c, idx, K, J, nMin, *numMin, ndims=3, dims[]={0, 0, 8};
+    int i, j, n, c, idx, K, J, nMin, *numMin, ndims=3; 
+    mwSize dims[]={0, 0, 8};
     
     // Get pointers to inputs
     M = (double *)mxGetPr(prhs[0]); // elevations
