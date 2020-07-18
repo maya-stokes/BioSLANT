@@ -1,5 +1,10 @@
 function [p g] = FT(p,g)
 
+% Calculate fault damage factor, which reduces K close to fault planes
+if p.doFaults
+    [p,g] = FaultDist(p,g);
+end
+
 % calculate RHS of the NKWE, recording the Courant number and which points 
 % exceed the channel incision threshold
 [RHS g.Channels Courant] = NKWE(g,p);

@@ -33,11 +33,26 @@ switch p.plottype
         g.y = p.dy*(0:p.K-1);
         imagesc(g.x,g.y,g.U)
         axis image
+        set(gca,'ydir','normal')
         title(['Iteration= 0, t=' num2str(p.t)])
         set(gca, 'nextplot', 'replacechildren');
-        set(p.fighandle, 'color', [1 1 1], 'colormap', jet);
+        set(p.fighandle, 'color', [1 1 1]); 
+        colormap('parula'); 
         colorbar
         
+        % Calculate fault plane locations and distances
+        if p.doFaults && p.plotFaults
+            [p,g] = FaultDist(p,g);
+            hold on;
+            nf = size(g.FaultDist,3);
+            for i = 1:nf
+                contour(g.x,g.y,g.FaultDist(:,:,i),[0 0],'w','LineWidth',3)
+            end  
+        end
+        
+        if isfield(p,'zmin') == 1
+            caxis([p.zmin p.zmax]); 
+        end
 %         set(gca,'visible','off')
 %         colorbar off
 

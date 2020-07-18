@@ -38,10 +38,14 @@ while p.t < p.tf
     
     %%%%%%%%%%%%%%%%%%%%%%%%% SAVE DATA %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    if p.doSaveOutput
+     if p.doSaveOutput
         if ~rem(n,p.saveint)
             p.lastsave = n/p.saveint + 1;
             g.output(:,:,p.lastsave) = g.U;
+            if p.doFaults
+                g.faultmat(:,:,p.lastsave) = g.FaultFactor;
+            end          
+            
             g.t(p.lastsave) = p.t;
         end
     end
