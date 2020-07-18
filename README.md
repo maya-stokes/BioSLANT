@@ -7,13 +7,11 @@ Tadpole is a simple landscape evolution model that runs in MATLAB. The current v
 BioSLANT is a spatially explicit neutral community model takes the output from Tadpole and simulates the dispersal, speciation, and extinction of organisms throughout the river networks.  
 
 Directory: 
-Tadpole: Tadpole including functions for tracking and visualizing river captures and a fault with different erodibility
-example-Tadpole fault: use one of the example scripts to get started simulating a landscape with a dipping fault of higher erodibility, calculating drainage basin reorganization statistics, and visualizing river captures.
-BioSLANT: Neutral community model functions.
-example-bioSLANT: Copy and paste the function "example_bioSLANt.m" into the main directory to get started. This script will walk through the main bioSLANT functions for 1) calculating the dispersal and habitat capacity functions 
-                  2) Running a NCM simulation to steady state and 3) Running BioSLANT on a dynamic landscape with river captures. Sample outputs produced by this script are in this folder as well.
-                   To use the example script, add BioSLANT and "example_Tadpole fault" to your path. 
-StokesPerron2020_Result Example: Sample results for the fully coupled model from Stokes and Perron (in review, JGR: Earth Surface) for one set of biological parameters and file with list of parameters used in the paper. 
++ Main: Tadpole including functions for tracking and visualizing river captures and a fault with different erodibility
++ example-Tadpole fault: use one of the example scripts to get started simulating a landscape with a dipping fault of higher erodibility, calculating drainage basin reorganization statistics, and visualizing river captures.
++ BioSLANT: Neutral community model functions.
++ example-bioSLANT: Copy and paste the function "example_bioSLANt.m" into the main directory to get started. This script will walk through the main bioSLANT functions for 1) calculating the dispersal and habitat capacity functions 2) Running a NCM simulation to steady state and 3) Running BioSLANT on a dynamic landscape with river captures. Sample outputs produced by this script are in this folder as well. To use the example script, add BioSLANT and "example_Tadpole fault" to your path. 
++ StokesPerron2020_Result Example: Sample results for the fully coupled model from Stokes and Perron (in review, JGR: Earth Surface) for one set of biological parameters and file with list of parameters used in the paper. 
 
 If you use BioSLANT for work that results in a publication, please acknowledge BioSLANT in the text and cite the following paper: 
 
