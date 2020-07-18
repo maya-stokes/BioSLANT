@@ -1,7 +1,7 @@
 # BioSLANT : Biodiversity on Simulated LAndscapes using Neutral Theory 
 
 MIT landscape evolution model (Tadpole)
-MIT spatially explicit neutral community model (BioSLANT)
++ MIT spatially explicit neutral community model (BioSLANT)
 
 Tadpole is a simple landscape evolution model that runs in MATLAB. The current version will run in 64-bit Mac OS X or Windows. 
 BioSLANT is a spatially explicit neutral community model takes the output from Tadpole and simulates the dispersal, speciation, and extinction of organisms throughout the river networks.  
