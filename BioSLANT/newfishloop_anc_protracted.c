@@ -37,7 +37,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Get dimensions of inputs
     mwSize nhabitats,nfishall,nt,n_inc,jk,n_inc_old; //asign mwSize type (same as int in default mex setting)
     nhabitats=mxGetM(prhs[1]); // number of habitats
-    nfishall = mxGetM(prhs[6]); //number of fish units
+    nfishall = mxGetM(prhs[6]); //number of fish unit
     nt = mxGetM(prhs[7]); //number of iterations to loop through
     n_inc = mxGetM(prhs[11]); // number of rows in incipient species matrix
     
@@ -46,20 +46,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     speciesout =  (double *) mxGetPr(plhs[0]= mxCreateDoubleMatrix(nfishall, 1, mxREAL)); //species vector
     nspecies_out = (double *)mxGetPr(plhs[1] = mxCreateDoubleMatrix(1,1,mxREAL)); //number of speciations
     
-//     if (*track_ancestry == 1) { //if track ancestry is on
-        double *child,*anc;
-        mwSize nchild, anc_mem_alloc; 
-        anc_mem_alloc = nfishall; 
-        nchild = 0;
-        child =  mxCalloc(anc_mem_alloc,sizeof(double));
-        anc = mxCalloc(anc_mem_alloc,sizeof(double));
-//     }
-    
-    
+// //     if (*track_ancestry == 1) { //if track ancestry is on
+//         double *child,*anc;
+//         mwSize nchild, anc_mem_alloc; 
+//         anc_mem_alloc = nfishall; 
+//         nchild = 0;
+//         child =  mxCalloc(anc_mem_alloc,sizeof(double));
+//         anc = mxCalloc(anc_mem_alloc,sizeof(double));
+// //     }
+//     
+//     
     int *inc_ind_out,*t_inc_out; // dynamic data
     double *cdf,*cdfind;
     mwSize index,cdflength,cdfindlength,jindex,mem_alloc;
-    
+      
     if (nfishall>n_inc) {
             mem_alloc = nfishall;
     }
@@ -69,43 +69,51 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     inc_ind_out = mxCalloc(mem_alloc,sizeof(int)); // start by allocating nfishunits amount of memory
     t_inc_out = mxCalloc(mem_alloc,sizeof(int));
-    cdf = mxCalloc(cdflength,sizeof(double));
-    cdfind = mxCalloc(cdfindlength,sizeof(double));
+    
     
     cdflength = nhabitats+2;
     cdfindlength = nhabitats+1;
+
+    cdf = mxCalloc(cdflength,sizeof(double));
+    cdfind = mxCalloc(cdfindlength,sizeof(double));
     
+    
+
     for (index=0;index<n_inc;index++) {
         inc_ind_out[index] = inc_ind[index];
         t_inc_out[index] = t_inc[index];
     }
-    
+
     for (jj=0;jj<nt;jj++){
+
         //CHECK TO SEE IF INCIPIENT SPECIES BECOME REAL SPECIES
         speciation_flag = 0; //set speciation to zero at the start
         inc_disp = 0; //set flags for dispersal of incipient species to zero
         inc_dh = 0;
         for (j = 0;  j < n_inc; j++) {
             time_dif = jj - t_inc_out[j]; //time is incipient
+//             mexPrintf("%d\n", t_inc_out[j]);
+
             if (time_dif >= *tau) {
+
                 speciation_flag = 1; //speciation happened
                 ind = inc_ind_out[j] - 1; //fish unit that is incipient
                 
-                if (*track_ancestry == 1) { //if you're tracking ancestry, note the species of the ancestor
-                    if (speciesout[ind] == 0){ /* if you haven't already replaced this fish  take from input vector */
-                        anc_ind = speciesvec[ind];
-                    }
-                    else { /* if you have already replaced this fish take from output vector */
-                        anc_ind = speciesout[ind];
-                    }
-                }
-                
+//                 if (*track_ancestry == 1) { //if you're tracking ancestry, note the species of the ancestor
+//                     if (speciesout[ind] == 0){ /* if you haven't already replaced this fish  take from input vector */
+//                         anc_ind = speciesvec[ind];
+//                     }
+//                     else { /* if you have already replaced this fish take from output vector */
+//                         anc_ind = speciesout[ind];
+//                     }
+ //               }
+//                 
                 newspecies = *nspecies+1;
                 speciesout[ind] = newspecies; //add new species to species vec
                 inc_ind_out[j] = nfishall+1; //flag to remove
             }
         }
-        
+// //         
         if (speciation_flag == 1) {
             *nspecies = *nspecies+1;
             jindex = 0;
@@ -123,51 +131,51 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                     n_inc = n_inc -1;
                 }
             }
-            
-            if (*track_ancestry == 1) {
-                child[nchild] = *nspecies;
-                anc[nchild] = anc_ind;
-                nchild = nchild +1; 
-                
-                if (nchild > anc_mem_alloc) {
-                    anc_mem_alloc = anc_mem_alloc + nfishall;
-                    anc = mxRealloc(anc,sizeof(double)*anc_mem_alloc);
-                    child = mxRealloc(child,sizeof(double)*anc_mem_alloc);
-                }
-                
-            }
+//             
+// //             if (*track_ancestry == 1) {
+// //                 child[nchild] = *nspecies;
+// //                 anc[nchild] = anc_ind;
+// //                 nchild = nchild +1; 
+// //                 
+// //                 if (nchild > anc_mem_alloc) {
+// //                     anc_mem_alloc = anc_mem_alloc + nfishall;
+// //                     anc = mxRealloc(anc,sizeof(double)*anc_mem_alloc);
+// //                     child = mxRealloc(child,sizeof(double)*anc_mem_alloc);
+// //                 }
+// //                 
+//   //          }
         }
-        
-// SPECIATON OR DISPERSAL?
+//         
+// // SPECIATON OR DISPERSAL?
         index = cdflength-2;
         dh = (int) deathrand[jj] - 1; // place in fish vec, for zero based indexing subtract 1
         deathind = fishhab[dh];
         
         /* make cdf array */
         ind =((cdflength)*((int)(deathind-1))); // index for probability value in cdf
-//         mexPrintf("%f\n", deathind);
         for (jk=0; jk<cdflength;jk++ ) {
-            cdf[jk] = cdfP[ind+jk];
-//              mexPrintf("%f\n",cdf[jk]);
+           cdf[jk] = cdfP[ind+jk];
 
         }
-        
-        /* make cdf ind array */
+//            mexPrintf("%f\n",cdf[index]);
+
+//         /* make cdf ind array */
         ind = (cdfindlength*((int)(deathind-1))); // index for cdfind
         for (jk=0; jk<cdfindlength;jk++ ) {
             cdfind[jk] = cdfPind[ind+jk];
 //              mexPrintf("%f\n",cdfind[jk]);
         }
-        
+//         
         num = randvec[jj]; /* get a random number between 0 and 1 */
-        
+         
         
         /* find bin */
         while (num <= cdf[index] && cdf[index] > 0 && index > 0) {
             index--;
         }
-       
-//         mexPrintf("index = %g\n",cdfind[index]); 
+//        
+//        mexPrintf("num = %f\n",num); 
+
         hab_ind = (int) cdfind[index] - 1; /* get the index (habitat) and cast it as an integer. Note that we also convert to zero-based. */
         
         if (hab_ind < nhabitats) { //dispersal          
@@ -192,7 +200,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 }
                 j++;
             }
-
+// 
             if (inc_disp !=0 || inc_dh != 0) { // if one of them is not an incipient species
                 if (inc_dh == 0) { //if the old guy is not an incipient species
                     n_inc_old = n_inc;
@@ -230,7 +238,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 }
            }
     }
+        
         else { // Speciation 
+//            mexPrintf("this happened \n");
+//            mexPrintf("%d\n",n_inc);
+
            t_inc_out[n_inc] = jj+1;
            inc_ind_out[n_inc] = dh+1;
            n_inc = n_inc+1;
@@ -240,11 +252,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                t_inc_out = mxRealloc(t_inc_out,sizeof(int)*mem_alloc);
            }
         }
-    }
-    
-     for (j=(nfishall-1); j--; ) { /*if there are any fish that haven't been replaced take from input vector */
-        if (speciesout[j] == 0) {
+}
+//     
+     for (j=(nfishall); j--;) { /*if there are any fish that haven't been replaced take from input vector */
+//         mexPrintf("%f\n",speciesvec[j]);
+         if (speciesout[j] == 0) {
             speciesout[j] = speciesvec[j];
+//             mexPrintf("%f\n",speciesout[j]);
         }
     }
         
@@ -260,25 +274,25 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     mxSetData(plhs[3],t_inc_out);
     mxSetM(plhs[3],n_inc);
     mxSetN(plhs[3],1);
-    
-    if (*track_ancestry == 1) {
-    plhs[4] = mxCreateDoubleMatrix(0,0,mxREAL);
-    mxSetPr(plhs[4],child);
-    mxSetM(plhs[4],nchild);
-    mxSetN(plhs[4],1);
-    
-    plhs[5] = mxCreateDoubleMatrix(0,0,mxREAL);
-    mxSetPr(plhs[5],anc);
-    mxSetM(plhs[5],nchild);
-    mxSetN(plhs[5],1);
-
-    }
-    else{
-        mxFree(child); 
-        mxFree(anc);
-    }
-
-    //Free memory
+//     
+//     if (*track_ancestry == 1) {
+//     plhs[4] = mxCreateDoubleMatrix(0,0,mxREAL);
+//     mxSetPr(plhs[4],child);
+//     mxSetM(plhs[4],nchild);
+//     mxSetN(plhs[4],1);
+//     
+//     plhs[5] = mxCreateDoubleMatrix(0,0,mxREAL);
+//     mxSetPr(plhs[5],anc);
+//     mxSetM(plhs[5],nchild);
+//     mxSetN(plhs[5],1);
+// 
+//     }
+//     else{
+//         mxFree(child); 
+//         mxFree(anc);
+//     }
+// 
+//     //Free memory
     mxFree(cdf);
     mxFree(cdfind);
 }

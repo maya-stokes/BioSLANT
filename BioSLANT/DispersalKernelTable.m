@@ -20,6 +20,7 @@ for i = 1:p.nhabitats
         
         case '2dt'
             K = p.p./(pi*p.u^2*(1+(distance./p.u).^2).^(p.p+1));
+            % Lynch et al. (2011) version: K = p.p/(pi*p.u*(1+(distance.^2/p.u)).^(p.p+1); 
         case 'uniform'
             K = ones(p.nhabitats,1)./p.nhabitats; %uniform dispersal within basin
             K(distance == 0) = 0;

@@ -36,7 +36,7 @@ for i = 2:nlandscapes
     [p,g] = setupncm(p,g,niter); %get new habitat capacity, landscape attributes without 
     %setting up a new initial condition
     
-    if p.ngen == p.saveInt %run the model 
+    if p.ngen <= p.saveInt %run the model and save each time
         [speciesmat,~,tmat] = run_ncm(p,g,niter,speciesmat0,g0,nsp0,tmat,p.ngen);
         save([save_name,'_',num2str(i),'.mat'],'speciesmat','p');  %save the initial condition
    
@@ -51,6 +51,7 @@ for i = 2:nlandscapes
         
         for j = 1:nsplit
             [speciesmat,~,tmat] = run_ncm(p,g,niter,speciesmat0,g0,nsp0,tmat,p.saveInt);
+            speciesmat0 = speciesmat; g0 = g;  nsp0 = max(speciesmat0); 
             save([save_name,'_lansdcape',num2str(i),'_saveint',num2str(j),'.mat'],'speciesmat','p');  %save the initial condition
         end        
     end

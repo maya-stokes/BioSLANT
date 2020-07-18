@@ -44,7 +44,8 @@ t = round(p.tau*p.nfishunits); %number of iterations required for protracted spe
 speciesmat = zeros(p.nfishunits,niter); %initialize the outputs
 nspecies = zeros(niter,1); 
 
-parfor jj = 1:niter
+% this can be run as a parfor loop 
+for jj = 1:niter
     
     s = RandStream.create('mrg32k3a','NumStreams',1,'Seed',streamOffset + jj);
 

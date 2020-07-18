@@ -42,8 +42,23 @@ for n=(frame_interval+1):frame_interval:N
     g.U = output(:,:,n); % elevations at frame n
     g = DrainageArea(p,g);
     A = g.A/(p.dx*p.dy); % drainage areas at frame n
-    dA = abs(A - Aprev);
-    dA = [dA(1,:) dA(end,:) dA(2:end-1,1)' dA(2:end-1,end)']; % just boundary points
+    dA_all = abs(A - Aprev);
+    dA = []; 
+    for j = 1:4 %only use non-periodic boundaries
+       if p.bvec(j) == 0 || p.bvec(j) == 1
+           if j == 1
+               vec = dA_all(2:end-1,1)'; 
+           elseif j == 2
+               vec = dA_all(2:end-1,end)'; 
+           elseif j == 3
+               vec = dA_all(1,:); 
+           elseif j == 4
+               vec = dA_all(end,:); 
+           end
+           dA = [dA vec]; 
+       end
+    end
+%     dA = [dA(1,:) dA(end,:) dA(2:end-1,1)' dA(2:end-1,end)']; % just boundary points
     Stats.dA(framenum) = 0.5*sum(dA); % total area exchanged between boundary points. We multiply by 1/2 because otherwise we could count each divide point displacement twice
     Stats.dAdt(framenum) = mean(dA)/(t(n) - tprev); % average dA/dt
 
@@ -57,38 +72,41 @@ for n=(frame_interval+1):frame_interval:N
         
     % now record sizes of captures
     [icap,jcap,vcap] = find(dB); % indices and unique values of captures
-    dBvals = unique(vcap); % dBvals is a list of unique capture values
-                                    
-    % calculate the area of each capture in grid cells [A1 A2 A3 etc]
-    % should be able to do this with e.g. sum(vcap==dBvals(i)) for i=1:length(dBvals)
-    cnum = 0; % counts captures larger than Amin for this framenum
     
-    for i = 1:length(dBvals)
-        thecap = (vcap==dBvals(i));
+    %find which ones are large enough; 
+    capind = sub2ind(size(dB),icap,jcap); 
+    aind = A(capind);  %indices that exceed drainage area and switched basins
+    capind = capind(aind>Amin); aind = aind(aind>Amin); 
+    cnum = 0; 
+    
+    if any(capind) %if captures
+        [aind,ix] = sort(aind,'descend'); capind = capind(ix); %sort by drainage area
+        [D,~,~] = mexD8Dir(g.U,p.dy/p.dx,1*(~g.C),p.bvec,p.flood);
         
-        theicap = icap(thecap);
-        thejcap = jcap(thecap);
-        capind = sub2ind(size(dB),theicap,thejcap); % linear indices of the capture in dB
-        [~,maxAind] = max(A(capind));
-        maxAi = theicap(maxAind); % the row and column indices of the maximum drainage area in the capture
-        maxAj = thejcap(maxAind);
-        
-        CapBin = zeros(size(dB));
-        CapBin(capind) = 1; % binary image that is 1 for the capture, zero elsewhere
-        CapBin = bwselect(CapBin,maxAj,maxAi,8); % now CapBin is 1 only for points that are 8-connected to the maximum drainage area point
-        
-        [theicap,thejcap] = find(CapBin); % row and column indices of the contiguous capture
-        
-        acap = length(theicap); % number of grid points in the contiguous capture
-        if acap >= Amin % don't record the ones that are too small
-            cnum = cnum+1;
-            Stats.Acap{framenum}(cnum) = acap;
-            Stats.Acaptot(framenum) = Stats.Acaptot(framenum) + acap;
-            Stats.icap{framenum}{cnum} = theicap;
-            Stats.jcap{framenum}{cnum} = thejcap;
-        end
+        Basin_all = false(size(dB)); 
+        for i = 1:length(aind) %go through each and if it has already been accounted for skip, save all pixels within the basin
+
+            if Basin_all(capind(i)) %if in another basins don't count 
+                continue
+            else
+                
+                [iout,jout] = ind2sub(size(dB),capind(i)); %if not in another basin count, 
+                [Basins,~] = mexBasinModel(D,iout,jout,p.bvec); %find basin 
+                Basin_all(Basins == 1) = 1; %track what has already been labeled basin
+                
+                [theicap, thejcap] = find(Basins); 
+                
+                cnum = cnum+1;
+                Stats.Acap{framenum}(cnum) = aind(i);
+                Stats.Acaptot(framenum) = Stats.Acaptot(framenum) + aind(i);
+
+                Stats.icap{framenum}{cnum} = theicap;
+                Stats.jcap{framenum}{cnum} = thejcap;
+ 
+            end
+        end    
     end
-            
+    
     tprev = t(n);
     Aprev = A;
     Bprev = B;
